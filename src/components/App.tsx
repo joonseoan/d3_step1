@@ -1,11 +1,11 @@
-import One from "./Basic_1/_1";
-import Two from "./Basic_1/_2";
+import BasicDemo from "./Basic_Demo";
+import BasicChart from './Basic_Charts';
 
 const App = () => {
   return (
     <div>
-      <One />
-      <Two />
+      <BasicDemo />
+      <BasicChart />
     </div>
   );
 };

@@ -57,9 +57,9 @@ const LineChart = () => {
   // "line" is a generator to draw svg-based "lines".
   const lineFunc = line<MonthlySale>()
     // ?
-    .x((d: MonthlySale) => d.month * 3)
+    .x((d) => d.month * 3)
     // 350 - 100 = 250, 350 -130 = 220 ...... y point from the top
-    .y((d: MonthlySale) => h - d.sales)
+    .y((d) => h - d.sales)
     // select line shape
     .curve(curveLinear);
 

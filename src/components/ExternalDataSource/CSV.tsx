@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import d3 from "d3";
+import * as d3 from "d3";
 
 const CSV = () => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -8,10 +8,18 @@ const CSV = () => {
   // let ds;
 
   useEffect(() => {
-    // d3.csv()
+    console.log("ddddddkkkkkkkk");
+    d3.csv("../../data/MonthlySales.csv", (error: any, data: any) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("data: ", data);
+      }
+      return data;
+    });
   }, []);
 
-  return <div />;
+  return <div ref={ref} />;
 };
 
 export default CSV;

@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
+import monthSales from "./data-json/MonthlySales.json";
 import * as d3 from "d3";
 
 interface MonthlyData {
@@ -19,14 +20,14 @@ const CSV = () => {
 
   useEffect(() => {
     (async () => {
-      const ds = (await d3.csv("./data/monthlySales.csv"))
-        .slice(0, 12)
-        .map(({ month, sales }) => {
-          return {
-            month: month ? +month : 0,
-            sales: sales ? +sales : 0,
-          };
-        });
+      // const ds = (await d3.csv("./data/monthlySales.csv"))
+      //   .slice(0, 12)
+      //   .map(({ month, sales }) => {
+      //     return {
+      //       month: month ? +month : 0,
+      //       sales: sales ? +sales : 0,
+      //     };
+      //   });
 
       const svg = d3
         .select(ref.current)
@@ -36,7 +37,7 @@ const CSV = () => {
 
       svg
         .append("path")
-        .attr("d", lineFunc(ds))
+        .attr("d", lineFunc(monthSales))
         .attr("stroke", "purple")
         .attr("stroke-width", 2)
         .attr("fill", "none");
@@ -47,11 +48,11 @@ const CSV = () => {
       let salesTotal = 0;
       const metrics = [];
 
-      for (let i = 0; i < ds.length; i++) {
-        salesTotal += +ds[i].sales;
+      for (let i = 0; i < monthSales.length; i++) {
+        salesTotal += +monthSales[i].sales;
       }
 
-      const average = salesTotal / ds.length;
+      const average = salesTotal / monthSales.length;
 
       metrics.push("Sales total: " + salesTotal);
       metrics.push("Average: " + average.toFixed(2));
@@ -68,7 +69,7 @@ const CSV = () => {
 
   return (
     <div>
-      <h1>CSV File</h1>
+      <h1>JSON File</h1>
       <div ref={ref} />
     </div>
   );

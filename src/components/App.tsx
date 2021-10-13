@@ -1,6 +1,7 @@
 import BasicDemo from "./Basic_Demo";
 import BasicChart from "./Basic_Charts";
 import ExternalDataSource from "./ExternalDataSource";
+import APIFetch from "./APIFetch";
 
 const App = () => {
   return (
@@ -8,6 +9,7 @@ const App = () => {
       <BasicDemo />
       <BasicChart />
       <ExternalDataSource />
+      <APIFetch />
     </div>
   );
 };

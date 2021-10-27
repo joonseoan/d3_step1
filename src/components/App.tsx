@@ -3,6 +3,7 @@ import BasicChart from "./Basic_Charts";
 import ExternalDataSource from "./ExternalDataSource";
 import APIFetch from "./APIFetch";
 import Scaling from "./Scaling";
+import Axis from "./Axis";
 
 const App = () => {
   return (
@@ -17,6 +18,8 @@ const App = () => {
       <APIFetch />
       {/* step 5 */}
       <Scaling />
+      {/* step 6 */}
+      <Axis />
     </div>
   );
 };

@@ -19,7 +19,11 @@ const Scale_1 = () => {
   console.log(scale(270));
   console.log(scale(150));
 
-  return <div>Scale _1</div>;
+  return (
+    <div>
+      <h1>Scale Function Concept</h1>
+    </div>
+  );
 };
 
 export default Scale_1;

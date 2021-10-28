@@ -8,6 +8,16 @@ interface MonthlyData {
   sales: number;
 }
 
+const getDate = (d: Date) => {
+  const strDate = d.toString();
+
+  const year = +strDate.substr(0, 4);
+  const month = +strDate.substr(4, 2) - 1;
+  const day = +strDate.substr(6, 2);
+
+  return new Date(year, month, day);
+};
+
 const Axis_1 = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const h = 100;
@@ -20,17 +30,21 @@ const Axis_1 = () => {
     };
 
     const buildLineAndTable = (monthlySales: MonthlyData[]) => {
-      console.log("monthSales: ", monthlySales);
-
       const scaleX = d3
+        // need to implement time because of the values of the ticks are time.
+        // .timeFormat()
+        // .scale()
+        // .scale
         .scaleLinear()
         .domain([
           // because it can return undefined or string.
           d3.min(monthlySales, ({ month }) => month) as number,
           d3.max(monthlySales, ({ month }) => month) as number,
         ])
-        // to get axisY space.
-        .range([padding + 10, w - padding])
+        // To get axisY space, need to push the line chart to the right side.
+        // "padding + 5": padding which is axis width + 10 (space between axis right and line chart) which starts 25.
+        // "w - padding": w is the point, 100 from the "padding + 5" and subtract padding from "w"
+        .range([padding + 5, w - padding])
         .nice();
 
       const scaleY = d3
@@ -40,11 +54,17 @@ const Axis_1 = () => {
           d3.max(monthlySales, ({ sales }) => sales) as number,
         ])
         // Fit the graph in the axis scale.
+        // "h - padding": It starts from top to down. "300 - 20" is a start point of the top.
+        // "10":  give a space at the bottom
         .range([h - padding, 10])
         .nice();
 
       // still need scaleY to develop yAxis.
-      const yAxis = d3.axisLeft(scaleY);
+      // ticks(number): just show the number of ticks.
+      const yAxisGen = d3.axisLeft(scaleY).ticks(4);
+
+      // xAxis
+      const xAxisGen = d3.axisBottom(scaleX);
 
       const lineFunc = d3
         .line<MonthlyData>()
@@ -59,15 +79,21 @@ const Axis_1 = () => {
         .attr("height", h);
 
       // "g" is the grouping of the child elements like the one in the MS PPT.
-      const axis = svg
+      const yAxis = svg
         .append("g")
         // add 'axis'.
-        .call(yAxis)
+        .call(yAxisGen)
         // add class for css file.
         .attr("class", "axis")
         // x value is padding and y value is 0.
         // because it needs some space to show each tick and its value.
         .attr("transform", `translate(${padding}, 0)`);
+
+      const xAxis = svg
+        .append("g")
+        .call(xAxisGen)
+        .attr("class", "axis")
+        .attr("transform", `translate(0, ${h - padding})`);
 
       svg
         .append("path")

@@ -8,7 +8,7 @@ interface MonthlyData {
   sales: number;
 }
 
-const getDate = (d: Date) => {
+const getDate = (d: number) => {
   const strDate = d.toString();
 
   const year = +strDate.substr(0, 4);
@@ -30,22 +30,31 @@ const Axis_1 = () => {
     };
 
     const buildLineAndTable = (monthlySales: MonthlyData[]) => {
+      const minDate = getDate(monthlySales[0].month);
+      const maxDate = getDate(monthlySales[monthlySales.length - 1].month);
+
+      // console.log("minDate: ", minDate);
+
       const scaleX = d3
         // need to implement time because of the values of the ticks are time.
-        // .timeFormat()
-        // .scale()
-        // .scale
-        .scaleLinear()
-        .domain([
-          // because it can return undefined or string.
-          d3.min(monthlySales, ({ month }) => month) as number,
-          d3.max(monthlySales, ({ month }) => month) as number,
-        ])
+        // 2)
+        .scaleTime()
+        .domain([minDate, maxDate])
+
+        // 1) [With scaleLiner]
+        // .scaleLinear()
+        // .domain([
+        //   // because it can return undefined or string.
+        //   d3.min(monthlySales, ({ month }) => month) as number,
+        //   d3.max(monthlySales, ({ month }) => month) as number,
+        // ])
+
         // To get axisY space, need to push the line chart to the right side.
         // "padding + 5": padding which is axis width + 10 (space between axis right and line chart) which starts 25.
         // "w - padding": w is the point, 100 from the "padding + 5" and subtract padding from "w"
-        .range([padding + 5, w - padding])
-        .nice();
+        .range([padding + 5, w - padding]);
+      // nice(): to round but since it uses the timeFormat, it is not required.
+      // .nice();
 
       const scaleY = d3
         .scaleLinear()
@@ -56,19 +65,24 @@ const Axis_1 = () => {
         // Fit the graph in the axis scale.
         // "h - padding": It starts from top to down. "300 - 20" is a start point of the top.
         // "10":  give a space at the bottom
-        .range([h - padding, 10])
-        .nice();
+        .range([h - padding, 10]);
+      // to round
+      // .nice();
 
       // still need scaleY to develop yAxis.
       // ticks(number): just show the number of ticks.
       const yAxisGen = d3.axisLeft(scaleY).ticks(4);
 
       // xAxis
-      const xAxisGen = d3.axisBottom(scaleX);
+      // "ticks(d3.timeMonth, "%b")": monthly base display.
+      const xAxisGen = d3.axisBottom(scaleX).ticks(d3.timeMonth, "%b");
 
       const lineFunc = d3
         .line<MonthlyData>()
-        .x((d) => scaleX(d.month))
+        // 2) since it uses timeScale
+        .x((d) => scaleX(getDate(d.month)))
+        // 1) [Uses linearScale]
+        // .x((d) => scaleX(d.month))
         .y((d) => scaleY(d.sales))
         .curve(d3.curveLinear);
 

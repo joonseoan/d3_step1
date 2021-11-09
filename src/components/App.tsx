@@ -4,6 +4,7 @@ import ExternalDataSource from "./ExternalDataSource";
 import APIFetch from "./APIFetch";
 import Scaling from "./Scaling";
 import Axis from "./Axis";
+import Filters from "./Filters";
 
 const App = () => {
   return (
@@ -20,6 +21,8 @@ const App = () => {
       <Scaling />
       {/* step 6 */}
       <Axis />
+      {/* step 7 */}
+      <Filters />
     </div>
   );
 };

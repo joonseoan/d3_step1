@@ -64,7 +64,9 @@ const Filter_1 = () => {
   const h = 350;
   const w = 400;
 
-  useLayoutEffect(() => {
+  // test comparing useLayoutEffect vs useEffect
+  // https://betterprogramming.pub/5-steps-to-render-d3-js-with-react-functional-components-fcce6cec1411
+  useEffect(() => {
     function salesKPI(d: number) {
       if (d >= 250) return "#33CC66";
 
@@ -87,6 +89,7 @@ const Filter_1 = () => {
     }
 
     const svg = select(divRef.current)
+      // .exit()
       .append("svg")
       .attr("width", w)
       .attr("height", h);
@@ -118,12 +121,15 @@ const Filter_1 = () => {
       .attr("fill", "#666666")
       .attr("text-anchor", "start");
 
-    // For select element.
-    // const selElement = select(selectRef.current).on("change", () => {
+    // svg.exit().remove();
+    // svg.selectAll("*").remove();
+
+    // // For select element.
+    // select(selectRef.current).on("change", () => {
     //   const sel = select("#label-option").property("value");
+    //   console.log("sel: ", sel);
 
     //   if (sel) {
-    //     console.log("sel: ", sel);
     //     svg
     //       .selectAll("text")
     //       .data(monthlySales)
@@ -132,11 +138,8 @@ const Filter_1 = () => {
     //   }
     // });
 
-    // selElement.exit().remove();
-    svg.exit().remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
-
-  // https://betterprogramming.pub/5-steps-to-render-d3-js-with-react-functional-components-fcce6cec1411
 
   const handleOhChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
@@ -147,7 +150,12 @@ const Filter_1 = () => {
     <div>
       <div>
         <h1>Scatter Chart</h1>
-        <select id="label-option" onChange={handleOhChange} value={selected}>
+        <select
+          id="label-option"
+          ref={selectRef}
+          onChange={handleOhChange}
+          value={selected}
+        >
           <option value="all">All</option>
           <option value="minmax">Min/Max</option>
           <option value="none">None</option>

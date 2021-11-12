@@ -5,7 +5,7 @@ import {
   useState,
   useLayoutEffect,
 } from "react";
-import { select, min as d3min, max as d3max } from "d3";
+import { select, min as d3min, max as d3max, Selection } from "d3";
 
 interface MonthlySale {
   month: number;
@@ -13,10 +13,15 @@ interface MonthlySale {
 }
 
 const Filter_1 = () => {
+  const [svg, setSvg] = useState<Selection<
+    SVGSVGElement | null,
+    unknown,
+    null,
+    undefined
+  > | null>(null);
   const [selected, setSelected] = useState<string>("all");
-
-  const divRef = useRef(null);
-  const selectRef = useRef(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const selectRef = useRef<HTMLSelectElement | null>(null);
 
   const monthlySales: MonthlySale[] = [
     {
@@ -67,12 +72,6 @@ const Filter_1 = () => {
   // test comparing useLayoutEffect vs useEffect
   // https://betterprogramming.pub/5-steps-to-render-d3-js-with-react-functional-components-fcce6cec1411
   useEffect(() => {
-    function salesKPI(d: number) {
-      if (d >= 250) return "#33CC66";
-
-      return "#666666";
-    }
-
     function showMinMax(col: keyof MonthlySale, val: number, type: string) {
       const max = d3max(monthlySales, (d) => d[col]);
       const min = d3min(monthlySales, (d) => d[col]);
@@ -88,63 +87,69 @@ const Filter_1 = () => {
       }
     }
 
-    const svg = select(divRef.current)
-      // .exit()
-      .append("svg")
-      .attr("width", w)
-      .attr("height", h);
+    function salesKPI(d: number) {
+      if (d >= 250) return "#33CC66";
 
-    // add dot
-    svg
-      .selectAll("circle")
-      .data(monthlySales)
-      .enter()
-      .append("circle")
-      .attr("cx", (d) => d.month * 3)
-      .attr("cy", (d) => h - d.sales)
-      .attr("r", 5)
-      .attr("fill", (d) => salesKPI(d.sales));
+      return "#666666";
+    }
+    if (!svg) {
+      setSvg(select(svgRef.current));
+    } else {
+      svg.attr("width", w).attr("height", h);
 
-    svg
-      .selectAll("text")
-      .data(monthlySales)
-      .enter()
-      .append("text")
-      .text((d) => {
-        return showMinMax("sales", d.sales, selected);
-      })
-      .attr("x", (d) => d.month * 3 - 10)
-      .attr("y", (d) => h - d.sales - 10)
-      .attr("font-size", "12px")
-      .attr("font-family", "sans-serif")
-      // text color
-      .attr("fill", "#666666")
-      .attr("text-anchor", "start");
+      // add dot
+      svg
+        .selectAll("circle")
+        .data(monthlySales)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => d.month * 3)
+        .attr("cy", (d) => h - d.sales)
+        .attr("r", 5)
+        .attr("fill", (d) => salesKPI(d.sales));
 
-    // svg.exit().remove();
-    // svg.selectAll("*").remove();
+      // svg.exit().remove();
+      svg
+        .selectAll("text")
+        .data(monthlySales)
+        .enter()
+        .append("text")
+        .text((d) => {
+          console.log("ddd000dddddddddd");
+          return showMinMax("sales", d.sales, "all");
+        })
+        .attr("x", (d) => d.month * 3 - 10)
+        .attr("y", (d) => h - d.sales - 10)
+        .attr("font-size", "12px")
+        .attr("font-family", "sans-serif")
+        // text color
+        .attr("fill", "#666666")
+        .attr("text-anchor", "start");
 
-    // // For select element.
-    // select(selectRef.current).on("change", () => {
-    //   const sel = select("#label-option").property("value");
-    //   console.log("sel: ", sel);
+      select(selectRef.current).on("change", () => {
+        const sel = select("#label-option").property("value");
+        setSelected(sel);
+        console.log("sel: ", sel);
+        // setSelected(sel);
 
-    //   if (sel) {
-    //     svg
-    //       .selectAll("text")
-    //       .data(monthlySales)
-    //       .enter()
-    //       .text((d) => showMinMax("sales", d.sales, sel));
-    //   }
-    // });
+        svg
+          .selectAll("text")
+          .data(monthlySales)
+          .enter()
+          .text((d) => {
+            console.log("kkkk");
+            return showMinMax("sales", d.sales, selected);
+          });
+      });
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  }, [svg, selected]);
 
-  const handleOhChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const { value } = event.target;
-    setSelected(value);
-  };
+  // const handleOhChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  //   const { value } = event.target;
+  //   setSelected(value);
+  // };
 
   return (
     <div>
@@ -153,15 +158,15 @@ const Filter_1 = () => {
         <select
           id="label-option"
           ref={selectRef}
-          onChange={handleOhChange}
-          value={selected}
+          // onChange={handleOhChange}
+          // value={selected}
         >
           <option value="all">All</option>
           <option value="minmax">Min/Max</option>
           <option value="none">None</option>
         </select>
       </div>
-      <div ref={divRef} />
+      <svg ref={svgRef} />
     </div>
   );
 };

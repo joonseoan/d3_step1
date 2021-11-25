@@ -1,8 +1,8 @@
 import {
   useRef,
   useEffect,
-  ChangeEvent,
   useState,
+  ChangeEvent,
   useLayoutEffect,
 } from "react";
 import { select, min as d3min, max as d3max, Selection } from "d3";
@@ -21,6 +21,7 @@ const Filter_1 = () => {
   > | null>(null);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const selectRef = useRef<HTMLSelectElement | null>(null);
   const [selected, setSelected] = useState<string>("all");
 
   // const selectRef = useRef<HTMLSelectElement | null>(null);
@@ -99,75 +100,17 @@ const Filter_1 = () => {
       setSvg(select(svgRef.current));
     } else {
       svg.attr("width", w).attr("height", h);
-    }
 
-    // // add dot
-    // svg
-    //   .selectAll("circle")
-    //   .data(monthlySales)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("cx", (d) => d.month * 3)
-    //   .attr("cy", (d) => h - d.sales)
-    //   .attr("r", 5)
-    //   .attr("fill", (d) => salesKPI(d.sales));
-
-    // svg.exit().remove();
-    //   svg
-    //     .selectAll("text")
-    //     .data(monthlySales)
-    //     .enter()
-    //     .append("text")
-    //     .text((d) => {
-    //       console.log("ddd000dddddddddd");
-    //       return showMinMax("sales", d.sales, selected);
-    //     })
-    //     .attr("x", (d) => d.month * 3 - 10)
-    //     .attr("y", (d) => h - d.sales - 10)
-    //     .attr("font-size", "12px")
-    //     .attr("font-family", "sans-serif")
-    //     // text color
-    //     .attr("fill", "#666666")
-    //     .attr("text-anchor", "start");
-
-    //   // select(selectRef.current).on("change", () => {
-    //   //   const sel = select("#label-option").property("value");
-    //   //   setSelected(sel);
-    //   //   console.log("sel: ", sel);
-    //   //   // setSelected(sel);
-
-    //   //   svg
-    //   //     .selectAll("text")
-    //   //     .data(monthlySales)
-    //   //     .enter()
-    //   //     .text((d) => {
-    //   //       console.log("kkkk");
-    //   //       return showMinMax("sales", d.sales, selected);
-    //   //     });
-    //   // });
-    //   // }
-    // }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [svg]);
-
-  useEffect(() => {
-    if (svg) {
       svg
-        .selectAll("circle")
-        .data(monthlySales)
-        .enter()
-        .append("circle")
+        .selectAll("circle") // simply select elements even though the circle are not available.
+        .data(monthlySales) // data
+        .enter() // enter command for the data that were not used. in this case, circle is not available at all so that all data elements are used for the append('circle')
+        .append("circle") // now adds the circle elements.
         .attr("cx", (d) => d.month * 3)
         .attr("cy", (d) => h - d.sales)
         .attr("r", 5)
         .attr("fill", (d) => salesKPI(d.sales));
 
-      // const texts = svg.selectAll("text").data(monthlySales);
-
-      // texts.exit().remove();
-
-      // texts
       svg
         .selectAll("text")
         .data(monthlySales)
@@ -184,69 +127,49 @@ const Filter_1 = () => {
         .attr("fill", "#666666")
         .attr("text-anchor", "start");
 
-      // working on this one tomorrow
-      // select(selectRef.current).on("change", () => {
-      //   //   const sel = select("#label-option").property("value");
-      //   //   setSelected(sel);
-      //   //   console.log("sel: ", sel);
-      //   //   // setSelected(sel);
+      select(selectRef.current).on("change", (event) => {
+        setSelected(event.target.value);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [svg]);
 
-      //   //   svg
-      //   //     .selectAll("text")
-      //   //     .data(monthlySales)
-      //   //     .enter()
-      //   //     .text((d) => {
-      //   //       console.log("kkkk");
-      //   //       return showMinMax("sales", d.sales, selected);
-      //   //     });
-      //   // });
-      //   // }
+  // For the update, it is better to use useLayoutEffect.
+  // BTW, it is not data update, it is update for the d3 attributes.
+  useLayoutEffect(() => {
+    if (svg) {
+      svg
+        .selectAll("text")
+        .data(monthlySales)
+        /**
+         * [IMPORTANT] enter() should not be used for the update.
+         * d3.enter() returns the DOM elements that need to be added when the joined array is longer than the selection.
+         * d3.append() usually follows d3.enter and actually adds missing elements to the DOM.
+         */
+        // .enter()
+        .text((d) => {
+          return showMinMax("sales", d.sales, selected);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // if (svg) {
-  // svg.attr("width", w).attr("height", h);
-
-  // svg
-  //   .selectAll("circle")
-  //   .data(monthlySales)
-  //   .enter()
-  //   .append("circle")
-  //   .attr("cx", (d) => d.month * 3)
-  //   .attr("cy", (d) => h - d.sales)
-  //   .attr("r", 5)
-  //   .attr("fill", (d) => salesKPI(d.sales));
-
-  // svg
-  //   .selectAll("text")
-  //   .data(monthlySales)
-  //   .enter()
-  //   .append("text")
-  //   .text((d) => {
-  //     // console.log("ddd000dddddddddd");
-  //     return showMinMax("sales", d.sales, selected);
-  //   })
-  //   .attr("x", (d) => d.month * 3 - 10)
-  //   .attr("y", (d) => h - d.sales - 10)
-  //   .attr("font-size", "12px")
-  //   .attr("font-family", "sans-serif")
-  //   // text color
-  //   .attr("fill", "#666666")
-  //   .attr("text-anchor", "start");
-  // }
-
-  const handleOhChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const { value } = event.target;
-    // setSvg(null);
-    setSelected(value);
-  };
+  // [Important] We should not use this event handler to update d3 attribute.
+  // const handleOhChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  //   const { value } = event.target;
+  //   // setSvg(null);
+  //   setSelected(value);
+  // };
 
   return (
     <div>
       <div>
         <h1>Scatter Chart</h1>
-        <select id="label-option" onChange={handleOhChange} value={selected}>
+        <select
+          // onChange={handleOhChange}
+          value={selected}
+          ref={selectRef}
+        >
           <option value="all">All</option>
           <option value="minmax">Min/Max</option>
           <option value="none">None</option>

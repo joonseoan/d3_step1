@@ -1,10 +1,4 @@
-import {
-  useRef,
-  useEffect,
-  useState,
-  ChangeEvent,
-  useLayoutEffect,
-} from "react";
+import { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { select, min as d3min, max as d3max, Selection } from "d3";
 
 interface MonthlySale {
@@ -164,7 +158,7 @@ const Filter_1 = () => {
   return (
     <div>
       <div>
-        <h1>Scatter Chart</h1>
+        <h1>Filter_1 with Scatter Chart</h1>
         <select
           // onChange={handleOhChange}
           value={selected}

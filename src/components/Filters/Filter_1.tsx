@@ -159,11 +159,7 @@ const Filter_1 = () => {
     <div>
       <div>
         <h1>Filter_1 with Scatter Chart</h1>
-        <select
-          // onChange={handleOhChange}
-          value={selected}
-          ref={selectRef}
-        >
+        <select value={selected} ref={selectRef}>
           <option value="all">All</option>
           <option value="minmax">Min/Max</option>
           <option value="none">None</option>

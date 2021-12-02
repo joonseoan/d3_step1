@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState } from "react";
 import monthSales from "./data-json/MonthlySalesbyCategoryMultiple.json";
+import "./style.css";
 import {
   select,
   min as d3min,
   max as d3max,
-  Selection,
   scaleTime,
   scaleLinear,
   axisLeft,
@@ -13,8 +13,6 @@ import {
   curveLinear,
   timeMonth,
 } from "d3";
-
-import "./style.css";
 
 interface MonthlyData {
   month: number;
@@ -32,13 +30,7 @@ const getDate = (d: number) => {
 };
 
 const Filter_2 = () => {
-  // const [svg, setSVG] = useState<Selection<
-  //   SVGSVGElement | null,
-  //   unknown,
-  //   null,
-  //   undefined
-  // > | null | null>(null);
-  const [selected, setSelected] = useState<number>(12);
+  const [selected, setSelected] = useState<number | null>(null);
 
   const divRef = useRef<HTMLDivElement | null>(null);
   const selectRef = useRef<HTMLSelectElement | null>(null);
@@ -83,16 +75,16 @@ const Filter_2 = () => {
     // Axis Y
     svg
       .append("g")
-      .call(yAxisGen)
-      .attr("class", "y-axis")
-      .attr("transform", `translate(${padding}, 0)`);
+      .attr("class", "y axis")
+      .attr("transform", `translate(${padding}, 0)`)
+      .call(yAxisGen);
 
     // Axis X
     svg
       .append("g")
-      .call(xAxisGen)
-      .attr("class", "x-axis")
-      .attr("transform", `translate(0, ${h - padding})`);
+      .attr("class", "x axis")
+      .attr("transform", `translate(0, ${h - padding})`)
+      .call(xAxisGen);
 
     svg
       .append("path")
@@ -126,7 +118,7 @@ const Filter_2 = () => {
 
   useEffect(() => {
     // if (!svg) {
-    //   setSVG(dis)
+    // setSVG(select(divRef.current).append("svg"))
     // } else {
     monthSales.contents.forEach(({ category, monthlySales }) => {
       buildHeadline(category);
@@ -146,10 +138,6 @@ const Filter_2 = () => {
     const minDate = getDate(monthlySales[0].month);
     const maxDate = getDate(monthlySales[monthlySales.length - 1].month);
 
-    const scaleX = scaleTime()
-      .domain([minDate, maxDate])
-      .range([padding + 5, w - padding]);
-
     const scaleY = scaleLinear()
       .domain([
         d3min(monthlySales, ({ sales }) => sales) as number,
@@ -157,10 +145,15 @@ const Filter_2 = () => {
       ])
       .range([h - padding, 10]);
 
+    const scaleX = scaleTime()
+      .domain([minDate, maxDate])
+      .range([padding + 5, w - padding]);
+
     const yAxisGen = axisLeft(scaleY).ticks(4);
-    const xAxisGen = axisBottom(scaleX).ticks(timeMonth, "%b");
-    // --------------> Is it required?
-    // .ticks(monthlySales.length - 1);
+    const xAxisGen = axisBottom(scaleX)
+      // .ticks(timeMonth, "%b")
+      // --------------> Is it required?
+      .ticks(monthlySales.length - 1);
 
     const lineFunc = line<MonthlyData>()
       .x((d) => scaleX(getDate(d.month)))
@@ -176,13 +169,19 @@ const Filter_2 = () => {
     // .attr("width", w)
     // .attr("height", h);
 
+    // svg
+    //   .append("g")
+    //   .call(yAxisGen)
+    //   .attr("class", "y-axis")
+    //   .attr("transform", `translate(${padding}, 0)`);
+
     // Axis Y
-    svg.selectAll(".y-axis").append("g").call(yAxisGen); // <------------------------- need to modify it TOMORROW
+    // svg.selectAll(".y.axis").call(yAxisGen); // <------------------------- need to modify it TOMORROW
     // .attr("class", "axis")
     // .attr("transform", `translate(${padding}, 0)`);
 
     // Axis X
-    svg.selectAll(".x-axis").append("g").call(xAxisGen); // <------------------------- need to modify it TOMORROW
+    // svg.selectAll(".x.axis").call(xAxisGen); // <------------------------- need to modify it TOMORROW
     // .attr("class", "axis")
     // .attr("transform", `translate(0, ${h - padding})`);
 
@@ -217,12 +216,17 @@ const Filter_2 = () => {
   };
 
   useEffect(() => {
-    monthSales.contents.forEach(({ category, monthlySales }) => {
-      updateLineAndTable(
-        monthlySales.slice(monthlySales.length - selected, monthlySales.length),
-        category
-      );
-    });
+    if (selected) {
+      monthSales.contents.forEach(({ category, monthlySales }) => {
+        updateLineAndTable(
+          monthlySales.slice(
+            monthlySales.length - selected,
+            monthlySales.length
+          ),
+          category
+        );
+      });
+    }
   }, [selected]);
 
   console.log("selected: ", selected);

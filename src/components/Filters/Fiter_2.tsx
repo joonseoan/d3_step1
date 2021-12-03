@@ -12,6 +12,7 @@ import {
   line,
   curveLinear,
   timeMonth,
+  Selection,
 } from "d3";
 
 interface MonthlyData {
@@ -31,6 +32,12 @@ const getDate = (d: number) => {
 
 const Filter_2 = () => {
   const [selected, setSelected] = useState<number | null>(null);
+  const [svg, setSVG] = useState<Selection<
+    SVGSVGElement,
+    unknown,
+    null,
+    undefined
+  > | null>(null);
 
   const divRef = useRef<HTMLDivElement | null>(null);
   const selectRef = useRef<HTMLSelectElement | null>(null);
@@ -75,14 +82,14 @@ const Filter_2 = () => {
     // Axis Y
     svg
       .append("g")
-      .attr("class", "y axis")
+      .attr("class", "y-axis")
       .attr("transform", `translate(${padding}, 0)`)
       .call(yAxisGen);
 
     // Axis X
     svg
       .append("g")
-      .attr("class", "x axis")
+      .attr("class", "x-axis")
       .attr("transform", `translate(0, ${h - padding})`)
       .call(xAxisGen);
 
@@ -94,7 +101,9 @@ const Filter_2 = () => {
       .attr("fill", "none")
       .attr("class", `path-${category}`);
 
-    const t = select(divRef.current).append("table");
+    const t = select(divRef.current)
+      .append("table")
+      .attr("id", `table-${category}`);
 
     let salesTotal = 0;
     const metrics = [];
@@ -117,9 +126,6 @@ const Filter_2 = () => {
   };
 
   useEffect(() => {
-    // if (!svg) {
-    // setSVG(select(divRef.current).append("svg"))
-    // } else {
     monthSales.contents.forEach(({ category, monthlySales }) => {
       buildHeadline(category);
       buildLineAndTable(monthlySales, category);
@@ -128,8 +134,8 @@ const Filter_2 = () => {
     select(selectRef.current).on("change", (event) => {
       setSelected(event.target.value);
     });
-    // }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [svg]);
 
   const updateLineAndTable = (
     monthlySales: MonthlyData[],
@@ -150,69 +156,43 @@ const Filter_2 = () => {
       .range([padding + 5, w - padding]);
 
     const yAxisGen = axisLeft(scaleY).ticks(4);
-    const xAxisGen = axisBottom(scaleX)
-      // .ticks(timeMonth, "%b")
-      // --------------> Is it required?
-      .ticks(monthlySales.length - 1);
+    const xAxisGen = axisBottom(scaleX).ticks(timeMonth, "%b");
 
     const lineFunc = line<MonthlyData>()
       .x((d) => scaleX(getDate(d.month)))
       .y((d) => scaleY(d.sales))
       .curve(curveLinear);
 
-    const svg =
-      // .select(ref.current)
-      // svg should exist in the second useEffect?
-      // .select("svg")
-      // svg-category should exist in the second useEffect?
-      select(`#svg-${category}`);
-    // .attr("width", w)
-    // .attr("height", h);
-
-    // svg
-    //   .append("g")
-    //   .call(yAxisGen)
-    //   .attr("class", "y-axis")
-    //   .attr("transform", `translate(${padding}, 0)`);
+    const svg = select(`#svg-${category}`);
 
     // Axis Y
-    // svg.selectAll(".y.axis").call(yAxisGen); // <------------------------- need to modify it TOMORROW
-    // .attr("class", "axis")
-    // .attr("transform", `translate(${padding}, 0)`);
+    svg.select(".y-axis").call(yAxisGen as any);
 
     // Axis X
-    // svg.selectAll(".x.axis").call(xAxisGen); // <------------------------- need to modify it TOMORROW
-    // .attr("class", "axis")
-    // .attr("transform", `translate(0, ${h - padding})`);
+    svg.select(".x-axis").call(xAxisGen as any);
 
-    svg.selectAll(`.path-${category}`).attr("d", lineFunc(monthlySales));
-    // .attr("stroke", "purple")
-    // .attr("stroke-width", 2)
-    // .attr("fill", "none");
+    // Line graph
+    svg.select(`.path-${category}`).attr("d", lineFunc(monthlySales));
 
-    // [Only for the table] // ----------------> Need to fix this one tomorrow!!!
-    // const t = d3
-    //   .select(ref.current)
-    //   .append("table");
+    const table = select(`#table-${category}`);
 
-    // let salesTotal = 0;
-    // const metrics = [];
+    let salesTotal = 0;
+    const metrics = [];
+    console.log("monthly sales: ", monthlySales);
 
-    // for (let i = 0; i < monthlySales.length; i++) {
-    //   salesTotal += +monthlySales[i].sales;
-    // }
+    for (let i = 0; i < monthlySales.length; i++) {
+      salesTotal += +monthlySales[i].sales;
+    }
 
-    // const average = salesTotal / monthlySales.length;
+    const average = salesTotal / monthlySales.length;
 
-    // metrics.push("Sales total: " + salesTotal);
-    // metrics.push("Average: " + average.toFixed(2));
+    metrics.push("Sales total: " + salesTotal);
+    metrics.push("Average: " + average.toFixed(2));
 
-    // t.selectAll("tr")
-    //   .data(metrics)
-    //   .enter()
-    //   .append("tr")
-    //   .append("td")
-    //   .text((d) => d);
+    table
+      .selectAll("tr")
+      .data(metrics)
+      .text((d) => d);
   };
 
   useEffect(() => {

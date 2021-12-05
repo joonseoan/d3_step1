@@ -12,7 +12,6 @@ import {
   line,
   curveLinear,
   timeMonth,
-  Selection,
   easeLinear,
 } from "d3";
 
@@ -31,8 +30,9 @@ const getDate = (d: number) => {
   return new Date(year, month, day);
 };
 
-const Filter_2 = () => {
+const ToolTip_2 = () => {
   const [selected, setSelected] = useState<number | null>(null);
+
   const divRef = useRef<HTMLDivElement | null>(null);
   const selectRef = useRef<HTMLSelectElement | null>(null);
 
@@ -47,6 +47,12 @@ const Filter_2 = () => {
   const buildLineAndTable = (monthlySales: MonthlyData[], category: string) => {
     const minDate = getDate(monthlySales[0].month);
     const maxDate = getDate(monthlySales[monthlySales.length - 1].month);
+
+    // (1) First append a new 'div' before 'svg'
+    const tooltip = select(divRef.current)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
     const scaleX = scaleTime()
       .domain([minDate, maxDate])
@@ -71,7 +77,7 @@ const Filter_2 = () => {
       .append("svg")
       .attr("width", w)
       .attr("height", h)
-      .attr("id", `svg-${category}`);
+      .attr("id", `svg-${category}-sec`);
 
     // Axis Y
     svg
@@ -95,9 +101,43 @@ const Filter_2 = () => {
       .attr("fill", "none")
       .attr("class", `path-${category}`);
 
+    // (2) adding circle in line.
+    const dots = svg
+      .selectAll("circle")
+      .data(monthlySales)
+      .enter()
+      .append("circle")
+      // same the line value!!!!
+      .attr("cx", (d) => scaleX(getDate(d.month)))
+      .attr("cy", (d) => scaleY(d.sales))
+      // radius
+      .attr("r", 3)
+      .attr("fill", "#666666")
+      .attr("class", `circle-${category}`)
+      // Adding tooltip here
+      .on("mouseover", function (event) {
+        // get data.
+        // console.log("event.target: ", event.target.__data__.sales);
+        tooltip
+          // animation
+          .transition()
+          .duration(300)
+          .style("opacity", 0.85);
+
+        tooltip
+          // add element in the tooltip
+          .text(`Sales ${event.target.__data__.sales}K`)
+          // pageX and page Y it is position of the circle.
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY + "px");
+      })
+      .on("mouseout", function (event) {
+        tooltip.transition().duration(100).style("opacity", 0);
+      });
+
     const t = select(divRef.current)
       .append("table")
-      .attr("id", `table-${category}`);
+      .attr("id", `table-${category}-sec`);
 
     let salesTotal = 0;
     const metrics = [];
@@ -157,7 +197,7 @@ const Filter_2 = () => {
       .y((d) => scaleY(d.sales))
       .curve(curveLinear);
 
-    const svg = select(`#svg-${category}`);
+    const svg = select(`#svg-${category}-sec`);
 
     // Axis Y
     svg.select(".y-axis").call(yAxisGen as any);
@@ -172,19 +212,20 @@ const Filter_2 = () => {
       .transition()
       .duration(1000)
       .ease(easeLinear)
-
-      // Mor variant.
-      // https://observablehq.com/@d3/easing-animations
-      // .ease(easeElastic)
-      // .ease(easeBounce)
-
       .attr("d", lineFunc(monthlySales));
 
-    const table = select(`#table-${category}`);
+    // on Monday...update it.
+    const dots = svg.selectAll("circle").data(monthlySales).append("circle");
+    // same the line value!!!!
+    // .attr("cx", (d) => scaleX(getDate(d.month)))
+    // .attr("cy", (d) => scaleY(d.sales))
+    // radius
+
+    const table = select(`#table-${category}-sec`);
 
     let salesTotal = 0;
     const metrics = [];
-    console.log("monthly sales: ", monthlySales);
+    // console.log("monthly sales: ", monthlySales);
 
     for (let i = 0; i < monthlySales.length; i++) {
       salesTotal += +monthlySales[i].sales;
@@ -219,7 +260,7 @@ const Filter_2 = () => {
 
   return (
     <div>
-      <h1>Filter_2 with Line Chart</h1>
+      <h1>Tooltip2</h1>
       <p>
         Choose Data Range:
         <select ref={selectRef}>
@@ -234,4 +275,4 @@ const Filter_2 = () => {
   );
 };
 
-export default Filter_2;
+export default ToolTip_2;

@@ -5,6 +5,7 @@ import APIFetch from "./APIFetch";
 import Scaling from "./Scaling";
 import Axis from "./Axis";
 import Filters from "./Filters";
+import ToolTip from "./ToolTip";
 
 // https://betterprogramming.pub/5-steps-to-render-d3-js-with-react-functional-components-fcce6cec1411
 const App = () => {
@@ -24,6 +25,8 @@ const App = () => {
       <Axis />
       {/* step 7 */}
       <Filters />
+      {/* step 8 */}
+      <ToolTip />
     </div>
   );
 };

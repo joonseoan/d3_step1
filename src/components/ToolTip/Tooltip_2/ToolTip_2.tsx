@@ -102,7 +102,7 @@ const ToolTip_2 = () => {
       .attr("class", `path-${category}`);
 
     // (2) adding circle in line.
-    const dots = svg
+    svg
       .selectAll("circle")
       .data(monthlySales)
       .enter()
@@ -185,6 +185,11 @@ const ToolTip_2 = () => {
       ])
       .range([h - padding, 10]);
 
+    const tooltip = select(divRef.current)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
     const scaleX = scaleTime()
       .domain([minDate, maxDate])
       .range([padding + 5, w - padding]);
@@ -199,6 +204,8 @@ const ToolTip_2 = () => {
 
     const svg = select(`#svg-${category}-sec`);
 
+    // svg.exit().remove();
+
     // Axis Y
     svg.select(".y-axis").call(yAxisGen as any);
 
@@ -208,17 +215,47 @@ const ToolTip_2 = () => {
     // Line graph
     svg
       .select(`.path-${category}`)
-      //Animation
       .transition()
       .duration(1000)
       .ease(easeLinear)
       .attr("d", lineFunc(monthlySales));
 
     // on Monday...update it.
-    const dots = svg.selectAll("circle").data(monthlySales).append("circle");
-    // same the line value!!!!
-    // .attr("cx", (d) => scaleX(getDate(d.month)))
-    // .attr("cy", (d) => scaleY(d.sales))
+    // svg.selectAll("circle").remove();
+    //
+    svg.selectAll(`.circle-${category}`).remove().exit();
+
+    // Not great code
+    svg
+      .selectAll("circle")
+      .data(monthlySales)
+      .enter()
+      .append("circle")
+      .attr("cx", (d) => scaleX(getDate(d.month)))
+      .attr("cy", (d) => scaleY(d.sales))
+      .attr("r", 3)
+      .attr("fill", "#666666")
+      .attr("class", `circle-${category}`)
+      .on("mouseover", function (event) {
+        // get data.
+        // console.log("event.target: ", event.target.__data__.sales);
+        tooltip
+          // animation
+          .transition()
+          .duration(300)
+          .style("opacity", 0.85);
+
+        tooltip
+          // add element in the tooltip
+          .text(`Sales ${event.target.__data__.sales}K`)
+          // pageX and page Y it is position of the circle.
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY + "px");
+      })
+      .on("mouseout", function (event) {
+        tooltip.transition().duration(100).style("opacity", 0);
+      });
+
     // radius
 
     const table = select(`#table-${category}-sec`);
@@ -255,8 +292,6 @@ const ToolTip_2 = () => {
       });
     }
   }, [selected]);
-
-  console.log("selected: ", selected);
 
   return (
     <div>

@@ -15,9 +15,9 @@ const Scale_1 = () => {
 
   // parameter: real data value
   // return value: the mapped value in the rage from 10 to 100.
-  console.log(scale(300));
-  console.log(scale(270));
-  console.log(scale(150));
+  // console.log(scale(300));
+  // console.log(scale(270));
+  // console.log(scale(150));
 
   return (
     <div>

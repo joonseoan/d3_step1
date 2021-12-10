@@ -184,7 +184,7 @@ const Filter_2 = () => {
 
     let salesTotal = 0;
     const metrics = [];
-    console.log("monthly sales: ", monthlySales);
+    // console.log("monthly sales: ", monthlySales);
 
     for (let i = 0; i < monthlySales.length; i++) {
       salesTotal += +monthlySales[i].sales;
@@ -215,7 +215,7 @@ const Filter_2 = () => {
     }
   }, [selected]);
 
-  console.log("selected: ", selected);
+  // console.log("selected: ", selected);
 
   return (
     <div>

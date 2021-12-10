@@ -45,9 +45,9 @@ const APIFetch = () => {
          * When fetch.get the data from the API server, that server can send the encoded contents. In this case, we can use atob.
          */
         const encodedData = await data.json();
-        console.log("encodedData ++++> ", encodedData);
+        // console.log("encodedData ++++> ", encodedData);
         const readableData = JSON.parse(window.atob(encodedData.content));
-        console.log("readableData: ", readableData);
+        // console.log("readableData: ", readableData);
 
         setMonthSales({ ...readableData });
       })();
@@ -103,7 +103,7 @@ const APIFetch = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monthSales]);
 
-  console.log("moNTHSALES: ", monthSales);
+  // console.log("moNTHSALES: ", monthSales);
 
   return (
     <div>

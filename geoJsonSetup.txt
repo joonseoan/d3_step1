@@ -1,0 +1,10 @@
+1. GeoJson file.
+  1) visit: https://www.census.gov/
+  2) Then find: BROWSE BY TOPIC -> Geography -> Mapping Files -> Cartographic Boundary Files (https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html)
+  3) And download any `shapefile`.
+  4) visit: https: https://mygeodata.cloud/converter/
+  5) Click on "Browse files or convert"
+  6) Upload the file from "www.census.gov"
+  7) Select the output file format, "geojson".
+  8) Then download the geojson file.
+

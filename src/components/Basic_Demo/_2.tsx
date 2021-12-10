@@ -23,8 +23,8 @@ const _2 = () => {
       .enter() // enter all rectangles into the svg elements if they do not exist already.
       .append("rect") // then basic rectangle which is
       .attr("x", (d, i) => {
-        console.log("d", d); // dataSet element
-        console.log("i", i); // index i = 0 ==> no space for the first rectangle.
+        // console.log("d", d); // dataSet element
+        // console.log("i", i); // index i = 0 ==> no space for the first rectangle.
 
         // 2) Use svg width and a number of dataSet elements.
         return (i * w) / dataset.length;
@@ -33,7 +33,7 @@ const _2 = () => {
         // return i * 25; // 25: 20 (rectangle width) + 5 (space)
       }) // space from the left side
       .attr("y", (d) => {
-        console.log("y: ", d);
+        // console.log("y: ", d);
         // important!!!!!! y is space from the top!!!
         return h - d;
       }) // space from the top side

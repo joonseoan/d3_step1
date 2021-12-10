@@ -6,6 +6,9 @@ import Scaling from "./Scaling";
 import Axis from "./Axis";
 import Filters from "./Filters";
 import ToolTip from "./ToolTip";
+import DrawingMaps from "./DrawingMaps";
+
+// useful website: https://awesomeopensource.com/project/sgratzl/d3tutorial
 
 // https://betterprogramming.pub/5-steps-to-render-d3-js-with-react-functional-components-fcce6cec1411
 const App = () => {
@@ -27,6 +30,8 @@ const App = () => {
       <Filters />
       {/* step 8 */}
       <ToolTip />
+      {/* step 9 */}
+      <DrawingMaps />
     </div>
   );
 };

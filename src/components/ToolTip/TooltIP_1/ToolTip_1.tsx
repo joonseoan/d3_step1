@@ -33,7 +33,7 @@ const ToolTip_1 = () => {
       })
       .attr("y", (d) => {
         // each y value's start point from the top. 0 ----> top.
-        console.log("result ---> ", h - d * 4, ", d: ", d);
+        // console.log("result ---> ", h - d * 4, ", d: ", d);
         return h - d * 4;
       })
       // start point above  + width.
@@ -51,8 +51,8 @@ const ToolTip_1 = () => {
       // Manipulating Label
       .on("mouseover", function (event) {
         // [Important]
-        console.log("this: ", this); //  ==== event.target (true) ==> <rect /> target HTML element;
-        console.log("event.target: ", event.target.height);
+        // console.log("this: ", this); //  ==== event.target (true) ==> <rect /> target HTML element;
+        // console.log("event.target: ", event.target.height);
 
         svg
           .append("text")

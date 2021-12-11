@@ -24,7 +24,7 @@ interface Properties {
   value?: number;
 }
 
-const AddingColor: FC = () => {
+const AddingPointer: FC = () => {
   const divRef = useRef<HTMLDivElement | null>(null);
   const w = 500;
   const h = 300;
@@ -102,10 +102,10 @@ const AddingColor: FC = () => {
 
   return (
     <div>
-      <h1>Adding Color</h1>
+      <h1>Adding Pointer</h1>
       <div ref={divRef} />
     </div>
   );
 };
 
-export default AddingColor;
+export default AddingPointer;

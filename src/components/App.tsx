@@ -7,6 +7,7 @@ import Axis from "./Axis";
 import Filters from "./Filters";
 import ToolTip from "./ToolTip";
 import DrawingMaps from "./DrawingMaps";
+import Dashboard from "./Dashboard";
 
 // useful website: https://awesomeopensource.com/project/sgratzl/d3tutorial
 
@@ -32,6 +33,8 @@ const App = () => {
       <ToolTip />
       {/* step 9 */}
       <DrawingMaps />
+      {/* step 10 */}
+      <Dashboard />
     </div>
   );
 };

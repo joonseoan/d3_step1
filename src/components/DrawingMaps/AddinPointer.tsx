@@ -1,35 +1,12 @@
-import { FC, useRef, useEffect, useImperativeHandle } from "react";
-import {
-  select,
-  geoPath,
-  geoAlbersUsa,
-  csv,
-  scaleLinear,
-  max,
-  DSVRowArray,
-} from "d3";
+import { FC, useRef, useEffect } from "react";
+import { select, geoPath, geoAlbersUsa, csv } from "d3";
 import usMap from "./data/us.json";
 
-interface StateSalesData {
-  state: string;
-  sales: string;
-}
-
-interface Properties {
-  GEO_ID: string;
-  STATE: string;
-  NAME: string;
-  LSAD: null;
-  CENSUSAREA: number;
-  value?: number;
-}
-
-const AddingPointer: FC = () => {
+const DrawingOutline: FC = () => {
   const divRef = useRef<HTMLDivElement | null>(null);
   const w = 500;
   const h = 300;
 
-  // 2) geoAlbersUSA.
   const projection = geoAlbersUsa()
     .translate([w / 2, h / 2]) // centering the map!å
     .scale(500);
@@ -43,58 +20,50 @@ const AddingPointer: FC = () => {
         .attr("width", w)
         .attr("height", h);
 
-      // define color range.
-      // must use <string> to have string based color code.
-      const color = scaleLinear<string>()
-        // https://colorbrewer2.org/#type=sequential&scheme=OrRd&n=6
-        // pick orange and select 6 in class dropdown.
-        .range([
-          "#fef0d9", // ---> number
-          "#fdd49e", // ---> number
-          "#fdbb84", // .
-          "#fc8d59", // .
-          "#e34a33", // .
-          "#b30000", // .
-        ]);
-
-      // geoJSON data parsing.
-      const ds = await csv("./data/state-sales.csv");
-
-      if (!ds || !ds.length) {
-        throw new Error("Failed to parse map data.");
-      }
-
-      // eslint-disable-next-line array-callback-return
-      const sales = ds.map(({ sales }) => {
-        if (sales) {
-          return +sales;
-        }
-      });
-
-      console.log("sales: ", sales);
-
-      // color domain!!! along with range.
-      color.domain([0, Math.max(...(sales as any))]);
-
-      // create "value" attribute to be used as a parameter to invoke color.
-      ds.forEach(({ state, sales }) => {
-        usMap.features.forEach(({ properties }: { properties: Properties }) => {
-          if (state === properties.NAME && sales) {
-            properties["value"] = +sales;
-          }
-        });
-      });
-
       svg
         .selectAll("path")
         .data(usMap.features)
         .enter()
         .append("path")
         .attr("d", path as any)
-        .attr("fill", ({ properties }: { properties: Properties }) =>
-          properties.value ? color(properties.value) : "#666666"
-        );
-      // .attr("fill", "#666666");
+        .attr("fill", "#666666");
+
+      const ds = await csv("./data/sales-by-city.csv");
+
+      if (!ds) {
+        return;
+      }
+
+      const cx: any = function ({ lon, lat }: { lon: string; lat: string }) {
+        const projectionData = projection([+lon, +lat]);
+        if (projectionData) {
+          return projectionData[0];
+        }
+      };
+
+      // longitude and latitude value definition
+      const cy: any = function ({ lon, lat }: { lon: string; lat: string }) {
+        const projectionData = projection([+lon, +lat]);
+        if (projectionData) {
+          return projectionData[1];
+        }
+      };
+
+      const r: any = function ({ sales }: { sales: string }) {
+        if (sales) {
+          return Math.sqrt(parseInt(sales)) * 0.02;
+        }
+      };
+
+      svg
+        .selectAll("circle")
+        .data(ds)
+        .enter()
+        .append("circle")
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", r)
+        .attr("fill", "red");
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,10 +71,10 @@ const AddingPointer: FC = () => {
 
   return (
     <div>
-      <h1>Adding Pointer</h1>
+      <h1>Drawing Map</h1>
       <div ref={divRef} />
     </div>
   );
 };
 
-export default AddingPointer;
+export default DrawingOutline;

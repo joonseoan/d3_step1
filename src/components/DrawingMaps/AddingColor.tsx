@@ -71,7 +71,7 @@ const AddingColor: FC = () => {
         }
       });
 
-      console.log("sales: ", sales);
+      // console.log("sales: ", sales);
 
       // color domain!!! along with range.
       color.domain([0, Math.max(...(sales as any))]);
